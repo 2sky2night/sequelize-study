@@ -9,14 +9,47 @@ const ClassController = {
    * @returns 
    */
   async toAddClass (ctx: Context) {
-    if (ctx.request.body === undefined) {
-      return ctx.body = response(null, '未携带请求体!', 400)
+    const res = await ClassService.addClass(ctx.request.body.cname)
+    ctx.body = response(res, '增加成功!')
+  },
+  /**
+   * 修改班级
+   * @param ctx 
+   */
+  async toUpdateClass (ctx: Context) {
+    const { cname, cid } = ctx.request.body
+    const res = await ClassService.updateClass(cid, cname)
+    if (res) {
+      ctx.body = response(res, '更新成功!')
+    } else {
+      ctx.body = response(null, '班级不存在!', 400)
     }
-    if (ctx.request.body.cname === undefined) {
-      return ctx.body = response(null, '有参数未携带!', 400)
+  },
+  /**
+   * 删除班级
+   * @param ctx 
+   */
+  async toDeleteClass (ctx: Context) {
+    const cid = +(ctx.query.cid as string)
+    const res = await ClassService.deleteClass(cid)
+    if (res) {
+      ctx.body = response(res, '删除成功!')
+    } else {
+      ctx.body = response(null, '班级不存在!', 400)
     }
-    const res = await ClassService.toAddClass(ctx.request.body.cname)
-    ctx.body = response(res, 'ok')
+  },
+  /**
+   * 获取班级
+   * @param ctx 
+   */
+  async toGetClass (ctx: Context) {
+    const cid = +(ctx.query.cid as string)
+    const res = await ClassService.getClass(cid)
+    if (res) {
+      ctx.body = response(res, 'ok')
+    } else {
+      ctx.body = response(null, '班级不存在!', 400)
+    }
   }
 }
 

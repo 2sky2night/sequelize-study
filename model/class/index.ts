@@ -1,6 +1,6 @@
 import sequelizeIns from '../../config/database';
 import { DataTypes, Model, InferCreationAttributes, InferAttributes, CreationOptional } from 'sequelize';
-
+import { getNowDateString } from '../../utils/tools';
 /**
  * 班级模型
  */
@@ -11,6 +11,30 @@ class Class extends Model<InferAttributes<Class>, InferCreationAttributes<Class>
   declare deletedAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
+  /**
+   * 查询班级是否存在
+   * @param cid 班级id
+   */
+  static async checkCidExist (cid: number) {
+    const res = await Class.findByPk(cid)
+    return res
+  }
+  /**
+   * 查询班级是否存在  返回字段返回字段不包含(deletedAt)
+   * @param cid 班级id
+   * @returns 
+   */
+  static async getClassBase (cid: number) {
+    const [ classItem ] = await Class.findAll({
+      attributes: {
+        exclude: [ 'deletedAt' ]
+      },
+      where: {
+        cid
+      }
+    })
+    return classItem ? classItem : null
+  }
 }
 
 Class.init(
@@ -21,9 +45,26 @@ Class.init(
       primaryKey: true,
     },
     cname: DataTypes.STRING,
-    deletedAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    createdAt: DataTypes.DATE,
+    updatedAt: {
+      type: DataTypes.DATE,
+      get () {
+        // 不要 this.updatedAt 因为这样会造成无限递归了，因为你在get函数里面读了自己
+        return getNowDateString(this.getDataValue('updatedAt'))
+      },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      get () {
+        return getNowDateString(this.getDataValue('createdAt'))
+      },
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      get () {
+        const temp = this.getDataValue('deletedAt')
+        return temp === null ? null : getNowDateString(this.getDataValue('deletedAt'))
+      },
+    },
   },
   {
     // 将模型链接到？

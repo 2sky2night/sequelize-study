@@ -8,9 +8,9 @@ export default {
    */
   async getStudent (sid: number) {
     // 该学生是否存在?
-    const res = await Student.checkSidExist(sid)
+    const res = await Student.getStudentBase(sid)
     if (res === null) {
-      return '学生不存在'
+      return 0
     } else {
       return res
     }
@@ -23,24 +23,7 @@ export default {
     const student = await Student.create({ sage, sname })
 
     return student.toJSON()
-    // // 查询该学生名是否存在了?
-    // const res = await Student.findAll({
-    //   where: {
-    //     sname
-    //   }
-    // })
 
-    // if (res.length) {
-    //   // 存在
-    //   return '学生名重复'
-    // } else {
-    //   // 不存在
-    //   const student = await Student.create({ sage, sname })
-
-    //   return student.toJSON()
-    // }
-
-    // 创建学生模型并插入到数据库中
   },
   /**
    * 更新学生
@@ -49,7 +32,7 @@ export default {
     // 该学生是否存在?
     const res = await Student.checkSidExist(sid)
     if (res === null) {
-      return '学生不存在'
+      return 0
     } else {
       // 存在 更新对应学生记录
       await Student.update(

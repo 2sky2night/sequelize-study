@@ -1,6 +1,7 @@
 // seq实例
 import sequelizeIns from '../../config/database';
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize'
+import { getNowDateString } from '../../utils/tools';
 
 // 使用原生seq+ts
 /**
@@ -16,6 +17,7 @@ class Student extends Model<InferAttributes<Student>, InferCreationAttributes<St
   declare sage: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+  declare deletedAt: CreationOptional<Date>;
   // 下面是对模型封装的公共方法
   /**
    * 查询该学生是否存在
@@ -25,6 +27,27 @@ class Student extends Model<InferAttributes<Student>, InferCreationAttributes<St
   static async checkSidExist (sid: number) {
     const res = await Student.findByPk(sid)
     return res
+  }
+  /**
+   * 获取学生数据(不包含deletedAt字段)
+   * @param sid 学生id
+   * @returns 学生实例或null（未找到）
+   */
+  static async getStudentBase (sid: number) {
+    const [ student ] = await Student.findAll({
+      attributes: {
+        exclude: [ 'deletedAt' ]
+      },
+      where: {
+        sid
+      }
+    })
+
+    if (student === null) {
+      return null
+    } else {
+      return student
+    }
   }
 }
 
@@ -44,8 +67,27 @@ Student.init(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
+    updatedAt: {
+      type: DataTypes.DATE,
+      // get是格式化该字段 也就是当读取该字段时会被格式化
+      get () {
+        // 不要 this.updatedAt 因为这样会造成无限递归了，因为你在get函数里面读了自己
+        return getNowDateString(this.getDataValue('updatedAt'))
+      },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      get () {
+        return getNowDateString(this.getDataValue('createdAt'))
+      },
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      get () {
+        const temp = this.getDataValue('deletedAt')
+        return temp === null ? null : getNowDateString(this.getDataValue('deletedAt'))
+      },
+    }
   },
   {
     sequelize: sequelizeIns,
