@@ -8,7 +8,6 @@ class Class extends Model<InferAttributes<Class>, InferCreationAttributes<Class>
   // 类型定义 CreationOptional为创建或更新时可以传入的选项
   declare cid: CreationOptional<number>;
   declare cname: string;
-  declare deletedAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   /**
@@ -18,22 +17,6 @@ class Class extends Model<InferAttributes<Class>, InferCreationAttributes<Class>
   static async checkCidExist (cid: number) {
     const res = await Class.findByPk(cid)
     return res
-  }
-  /**
-   * 查询班级是否存在  返回字段返回字段不包含(deletedAt)
-   * @param cid 班级id
-   * @returns 
-   */
-  static async getClassBase (cid: number) {
-    const [ classItem ] = await Class.findAll({
-      attributes: {
-        exclude: [ 'deletedAt' ]
-      },
-      where: {
-        cid
-      }
-    })
-    return classItem ? classItem : null
   }
 }
 
@@ -57,14 +40,7 @@ Class.init(
       get () {
         return getNowDateString(this.getDataValue('createdAt'))
       },
-    },
-    deletedAt: {
-      type: DataTypes.DATE,
-      get () {
-        const temp = this.getDataValue('deletedAt')
-        return temp === null ? null : getNowDateString(this.getDataValue('deletedAt'))
-      },
-    },
+    }
   },
   {
     // 将模型链接到？
@@ -73,15 +49,11 @@ Class.init(
     modelName: 'Class',
     // 强制表名和模型一致
     freezeTableName: true,
-    // 开启软删除
-    paranoid: true,
-    // 开启软删除
-    deletedAt: true
+    // // 开启软删除
+    // paranoid: true,
+    // // 开启软删除
+    // deletedAt: true
   }
 )
-
-// 创建表
-Class.sync()
-
 
 export default Class

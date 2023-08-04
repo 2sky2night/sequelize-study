@@ -50,6 +50,19 @@ const ClassController = {
     } else {
       ctx.body = response(null, '班级不存在!', 400)
     }
+  },
+  /**
+   * 获取班级的所有学生
+   * @param ctx 
+   */
+  async toGetAllStudent (ctx: Context) {
+    const cid = +(ctx.query.cid as string)
+    const res = await ClassService.getAllStudents(cid)
+    if (res) {
+      ctx.body = response(res, 'ok')
+    } else {
+      ctx.body = response(null, '班级不存在!', 400)
+    }
   }
 }
 

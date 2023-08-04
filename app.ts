@@ -1,6 +1,8 @@
 import Koa from 'koa'
 import RootRouter from './router'
 import KoaBody from 'koa-body'
+// 创建数据库表
+import './model'
 
 const app = new Koa()
 

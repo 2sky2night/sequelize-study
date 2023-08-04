@@ -2,6 +2,7 @@
 import sequelizeIns from '../../config/database';
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize'
 import { getNowDateString } from '../../utils/tools';
+import Class from '../class';
 
 // 使用原生seq+ts
 /**
@@ -17,7 +18,7 @@ class Student extends Model<InferAttributes<Student>, InferCreationAttributes<St
   declare sage: number;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
-  declare deletedAt: CreationOptional<Date>;
+  declare cid: number | null;
   // 下面是对模型封装的公共方法
   /**
    * 查询该学生是否存在
@@ -27,27 +28,6 @@ class Student extends Model<InferAttributes<Student>, InferCreationAttributes<St
   static async checkSidExist (sid: number) {
     const res = await Student.findByPk(sid)
     return res
-  }
-  /**
-   * 获取学生数据(不包含deletedAt字段)
-   * @param sid 学生id
-   * @returns 学生实例或null（未找到）
-   */
-  static async getStudentBase (sid: number) {
-    const [ student ] = await Student.findAll({
-      attributes: {
-        exclude: [ 'deletedAt' ]
-      },
-      where: {
-        sid
-      }
-    })
-
-    if (student === null) {
-      return null
-    } else {
-      return student
-    }
   }
 }
 
@@ -81,27 +61,21 @@ Student.init(
         return getNowDateString(this.getDataValue('createdAt'))
       },
     },
-    deletedAt: {
-      type: DataTypes.DATE,
-      get () {
-        const temp = this.getDataValue('deletedAt')
-        return temp === null ? null : getNowDateString(this.getDataValue('deletedAt'))
-      },
+    // 声明的外键
+    cid: {
+      type: DataTypes.BIGINT,
     }
   },
   {
     sequelize: sequelizeIns,
     modelName: 'Student',
     freezeTableName: true,
-    // 开启软删除
-    paranoid: true,
-    // 开启软删除
-    deletedAt: true
+    // // 开启软删除
+    // paranoid: true,
+    // // 开启软删除
+    // deletedAt: true
   }
 )
-
-// 创建表 (必须要有这个步骤，否则创建模型并保存到数据库时会一直报错)
-Student.sync()
 
 // import { PrimaryKey, AutoIncrement, Column, DataType, HasMany, IsEmail, Length, Table, Unique, Model, CreatedAt, UpdatedAt } from 'sequelize-typescript';
 // import path from 'path'

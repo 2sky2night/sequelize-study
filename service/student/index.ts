@@ -1,5 +1,6 @@
 // models
 import Student from '../../model/student'
+import Class from '../../model/class'
 
 export default {
   /**
@@ -8,7 +9,7 @@ export default {
    */
   async getStudent (sid: number) {
     // 该学生是否存在?
-    const res = await Student.getStudentBase(sid)
+    const res = await Student.checkSidExist(sid)
     if (res === null) {
       return 0
     } else {
@@ -72,6 +73,32 @@ export default {
         }
       )
       return Promise.resolve(1)
+    }
+  },
+  /**
+   * 将学生添加进入班级
+   * @param cid 班级id
+   * @param sid 学生id
+   * @returns -2班级存在 -1学生不存在 0学生已经进入班级了 1添加成功
+   */
+  async joinClass (cid: number, sid: number) {
+    // 查询该班级是否存在
+    const classItem = await Class.findByPk(cid)
+    // 班级不存在
+    if (classItem === null) return Promise.resolve(-2)
+    // 存在 查询该学生是否存在
+    const student = await Student.findByPk(sid)
+    // 学生不存在
+    if (student === null) return Promise.resolve(-1)
+    // 学生存在 查询是否已经加入班级了?
+    if (student.cid === null) {
+      // 未加入班级
+      student.set('cid', cid)
+      await student.save()
+      return Promise.resolve(1)
+    } else {
+      // 加入班级了
+      return Promise.resolve(0)
     }
   }
 }

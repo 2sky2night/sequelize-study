@@ -11,9 +11,12 @@ ClassRouter.post('/add', ClassMiddleWare.checkClassBodyWithoutId, ClassControlle
 ClassRouter.put('/update', ClassMiddleWare.checkClassBody, ClassController.toUpdateClass)
 
 // 删除班级
-ClassRouter.delete('/delete',ClassMiddleWare.checkClassCidQuery,ClassController.toDeleteClass)
+ClassRouter.delete('/delete', ClassMiddleWare.checkClassCidQuery, ClassController.toDeleteClass)
 
 // 获取班级
-ClassRouter.get('/get',ClassMiddleWare.checkClassCidQuery,ClassController.toGetClass)
+ClassRouter.get('/get', ClassMiddleWare.checkClassCidQuery, ClassController.toGetClass)
+
+// 获取班级下的所有学生
+ClassRouter.get('/allStudent', ClassMiddleWare.checkClassCidQuery, ClassController.toGetAllStudent)
 
 export default ClassRouter

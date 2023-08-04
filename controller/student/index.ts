@@ -62,5 +62,28 @@ export default {
       ctx.body = response(null, '学生不存在!', 400)
     }
 
+  },
+  /**
+   * 加入班级
+   * @param ctx 
+   */
+  async toJoinClass (ctx: Context) {
+    const { sid, cid } = ctx.request.body
+    if (sid === undefined || cid === undefined) {
+      return ctx.body = response(null, '未携带参数!', 400)
+    }
+    if (isNaN(+sid) || isNaN(+cid)) {
+      return ctx.body = response(null, '参数非法!', 400)
+    }
+    const res = await StudentService.joinClass(+cid, +sid)
+    if (res === -2) {
+      ctx.body = response(null, '班级不存在!', 400)
+    } else if (res === -1) {
+      ctx.body = response(null, '学生不存在!', 400)
+    } else if (res === 0) {
+      ctx.body = response(null, '学生已进入班级!', 400)
+    } else {
+      ctx.body = response(null, '进入班级成功!', 400)
+    }
   }
 }

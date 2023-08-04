@@ -1,6 +1,7 @@
 import Router from 'koa-router'
 import StudentController from '../../controller/student'
 import StudentMiddleware from '../../middleware/student'
+import PublicMiddleware from '../../middleware'
 
 const StudentRouter = new Router()
 
@@ -12,5 +13,7 @@ StudentRouter.post('/add', StudentMiddleware.checkStudentBodyWithoutId, StudentC
 StudentRouter.put('/update', StudentMiddleware.checkStudentBody, StudentController.toUpdateStudent)
 // 删
 StudentRouter.delete('/delete', StudentMiddleware.checkStudentSidQuery, StudentController.toDeleteStudent)
+// 加入班级
+StudentRouter.post('/joinClass', PublicMiddleware.checkBody, StudentController.toJoinClass)
 
 export default StudentRouter
