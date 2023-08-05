@@ -1004,9 +1004,19 @@ console.log(await foo.getBar()); // null
 
 其中
 
-**create**是创建Bar并指定一对多关联Foo
+**create**是创建Bar实例并关联到Foo实例
 
-**add**是指定Bar关联上Foo
+**add**是指定Bar实例关联上Foo实例
+
+**remove**是移除Bar实例上关联的Foo实例，并将引用Foo的外键置为Null
+
+**set**是更新Foo实例上关联的Bar实例
+
+**get**是获取Foo实例上关联的所有Bar实例
+
+**has**是验证Foo实例上是否有关联到Bar实例
+
+**count**是获取Foo实例上关联的所有Bar实例数量
 
 - `fooInstance.getBars()`
 - `fooInstance.countBars()`
@@ -1060,6 +1070,24 @@ const taskTitles = (await project.getTasks({
 #### `Foo.belongsToMany(Bar, { through: Baz })`声明多对多
 
 来自 `Foo.hasMany(Bar)` 的相同内容：其中add、set、remove都是操作关联表的数据，并不会操作源和目标表的数据，create是创建Bar并将多对多关系插入到关联表中。
+
+其中
+
+**get**是查询Foo实例关联的所有Bar实例
+
+**count**是查询Foo实例上关联的所有Bar实例数量的和
+
+**hasBar**是查询Foo实例上是否关联该Bar实例
+
+**set**是指定更新Foo实例上关联的多个Bar实例，可以用与批量更新Foo实例上关联的Bar实例。
+
+**add**是让Bar实例关联上Bar实例
+
+**remove**是让Foo实例移除与Bar实例的关联
+
+**create**是创建Bar实例，并立即关联上Foo实例
+
+注意，除了create会创建target模型以外，其余都是操作对应的关联表（也就是建立多对多时创建的表），什么是操作对应的关联表？就是操作source与target建立的映射表。例如学生和课程模型，当create时会创建学生并立即给学生选课表添加学生选课记录。
 
 - `fooInstance.getBars()`
 - `fooInstance.countBars()`
