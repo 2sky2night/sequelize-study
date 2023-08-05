@@ -1,6 +1,8 @@
 // 此文件用来按照外键约束的顺序来创建表
 import Class from './class';
+import Course from './course';
 import Student from './student';
+import StudentCourse from './student_course';
 
 // 创建表 以及创建各种表约束的地方
 (async function () {
@@ -9,17 +11,19 @@ import Student from './student';
 
   // 建立联系
   StudentAndClassRelation()
-
+  StudentAndCourseRelation()
   // 创建表
   await Class.sync()
   await Student.sync()
+  await Course.sync()
+  await StudentCourse.sync()
 
 })()
 
 /**
  * 班级和学生实体的关系 一对多
  */
-function StudentAndClassRelation () {
+function StudentAndClassRelation() {
 
   // 创建一个 一对一 关系, hasOne 和 belongsTo 关联一起使用;
   // 创建一个 一对多 关系, hasMany he belongsTo 关联一起使用;
@@ -51,7 +55,39 @@ function StudentAndClassRelation () {
     foreignKey: 'cid',
     // 参照的外键（被引用的字段,必须是主键）默认为被引用表的外键
     targetKey: 'cid',
-    constraints:false
+    constraints: false
+  })
+
+}
+
+/**
+ * 学生和课程之间的关系 多对多
+ */
+function StudentAndCourseRelation() {
+
+  // 建议双向定义，这样两个模型可以相互管理，也就是两个实例都会拥有管理的API
+
+  // 调用该函数时 source为调用者模型，target为第一个参数的模型
+  Student.belongsToMany(Course, {
+    // 创建的模型（表）
+    through: StudentCourse,
+    // 指定source(学生表)引用表的外键（将学生表中的主键作为外键引用）
+    foreignKey: 'sid',
+    // 指定target(课程表)引用的外键 (将课程表的主键作为外键引用)
+    otherKey: 'course_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  })
+
+  Course.belongsToMany(Student, {
+    // 创建的模型（表）
+    through: StudentCourse,
+    // 指定scource（课程表）的外键
+    foreignKey: 'course_id',
+    // 指定target（学生表）的额外键
+    otherKey: 'sid',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   })
 
 }

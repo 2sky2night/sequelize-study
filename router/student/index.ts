@@ -15,5 +15,7 @@ StudentRouter.put('/update', StudentMiddleware.checkStudentBody, StudentControll
 StudentRouter.delete('/delete', StudentMiddleware.checkStudentSidQuery, StudentController.toDeleteStudent)
 // 加入班级
 StudentRouter.post('/joinClass', PublicMiddleware.checkBody, StudentController.toJoinClass)
+// 从班级中移除
+StudentRouter.delete('/joinClass', StudentController.toRemoveJoinClass)
 
 export default StudentRouter

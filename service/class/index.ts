@@ -6,7 +6,7 @@ export default {
    * 创建班级
    * @param cname 班级名称
    */
-  async addClass (cname: string) {
+  async addClass(cname: string) {
     const res = await Class.create({ cname })
     return res
   },
@@ -16,7 +16,7 @@ export default {
    * @param cname 班级名称
    * @returns 0班级不存在
    */
-  async updateClass (cid: number, cname: string) {
+  async updateClass(cid: number, cname: string) {
     const classItem = await Class.checkCidExist(cid)
     if (classItem) {
       // 存在
@@ -33,7 +33,7 @@ export default {
    * 删除班级
    * @param cid 
    */
-  async deleteClass (cid: number) {
+  async deleteClass(cid: number) {
     const classItem = await Class.checkCidExist(cid)
     if (classItem) {
       // 存在 删除班级
@@ -49,7 +49,7 @@ export default {
    * @param cid 班级id 
    * @returns 
    */
-  async getClass (cid: number) {
+  async getClass(cid: number) {
     const classItem = await Class.checkCidExist(cid)
     if (classItem) {
       // 存在 
@@ -63,7 +63,7 @@ export default {
    * 获取班级里的所有学生
    * @param cid 班级id
    */
-  async getAllStudents (cid: number) {
+  async getAllStudents(cid: number) {
     // 预先加载技术
     const classItem = await Class.findOne({
       where: {
@@ -78,10 +78,11 @@ export default {
     // 班级不存在
     if (classItem === null) return Promise.resolve(0)
     // 存在
-    // @ts-ignore 班级存在直接插入一个学生
-    classItem.createStudent({ sname: '张三', sage: 123 })
+    // 班级存在直接在该班级中插入一个学生
+    // await classItem.createStudent({ sname: '张三', sage: 123 })
+    // console.log(await classItem.getStudents())
     return classItem
-
+ 
     // 延迟加载技术
     // const classItem = await Class.findByPk(cid)
     // if (classItem === null) return Promise.resolve(0)

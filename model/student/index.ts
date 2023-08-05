@@ -1,8 +1,9 @@
 // seq实例
 import sequelizeIns from '../../config/database';
-import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize'
+import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, BelongsToCreateAssociationMixin, BelongsToManyHasAssociationMixin, BelongsToManyHasAssociationsMixin, BelongsToManyGetAssociationsMixinOptions, BelongsToManyGetAssociationsMixin, BelongsToManyAddAssociationMixin, BelongsToManySetAssociationsMixin, BelongsToManyRemoveAssociationMixin } from 'sequelize'
 import { getNowDateString } from '../../utils/tools';
 import Class from '../class';
+import Course from '../course';
 
 // 使用原生seq+ts
 /**
@@ -19,13 +20,37 @@ class Student extends Model<InferAttributes<Student>, InferCreationAttributes<St
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
   declare cid: number | null;
+  /**
+   * 获取当前学生的班级
+   */
+  declare getClass: BelongsToCreateAssociationMixin<Class>;
+  /**
+   * 该学生是否选择了该课程
+   */
+  declare hasCourse: BelongsToManyHasAssociationMixin<Course, number>;
+  /**
+   * 该学生选择的课程
+   */
+  declare getCourses: BelongsToManyGetAssociationsMixin<Course>;
+  /**
+   * 给学生添加一个课程
+   */
+  declare addCourse: BelongsToManyAddAssociationMixin<Course, number>;
+  /**
+   * 修改学生的课程
+   */
+  declare setCourses: BelongsToManySetAssociationsMixin<Course, number>;
+  /**
+   * 取消修读该课程
+   */
+  declare removeCourse: BelongsToManyRemoveAssociationMixin<Course, number>;
   // 下面是对模型封装的公共方法
   /**
    * 查询该学生是否存在
    * @param sid 学生id
    * @returns 不存在返回null 存在则返回实例
    */
-  static async checkSidExist (sid: number) {
+  static async checkSidExist(sid: number) {
     const res = await Student.findByPk(sid)
     return res
   }
@@ -50,14 +75,14 @@ Student.init(
     updatedAt: {
       type: DataTypes.DATE,
       // get是格式化该字段 也就是当读取该字段时会被格式化
-      get () {
+      get() {
         // 不要 this.updatedAt 因为这样会造成无限递归了，因为你在get函数里面读了自己
         return getNowDateString(this.getDataValue('updatedAt'))
       },
     },
     createdAt: {
       type: DataTypes.DATE,
-      get () {
+      get() {
         return getNowDateString(this.getDataValue('createdAt'))
       },
     },
